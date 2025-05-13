@@ -28,6 +28,7 @@ const Login = ({ setIsAuthenticated }) => {
       localStorage.setItem("user", JSON.stringify(data.user));
       localStorage.setItem("role", data.user.role); // Save role to localStorage
 
+
       // ✅ Notify parent component with token and role
       setIsAuthenticated(data.token, data.user.role);
 

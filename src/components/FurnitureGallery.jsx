@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const FurnitureGallery = () => {
   const [furnitureItems, setFurnitureItems] = useState([]);
@@ -8,6 +9,7 @@ const FurnitureGallery = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -69,32 +71,34 @@ const FurnitureGallery = () => {
 
   const handleAddToWishlist = async (item) => {
     const token = localStorage.getItem("token");
-
+  
     if (!token) {
       alert("Please login to add items to wishlist.");
       return;
     }
-
+  
     try {
       const response = await axios.post(
         "http://localhost:5000/api/wishlist/add",
-        {
-          productId: item._id,
-        },
+        { productId: item._id },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-
+  
       alert(`${item.name} added to wishlist ❤️`);
       console.log("Wishlist item saved:", response.data);
+      
+      // Manually update the wishlist state to trigger re-render
+      setWishlist((prevWishlist) => [...prevWishlist, item]);
     } catch (error) {
       console.error("Failed to add to wishlist:", error);
       alert("❌ Failed to add to wishlist. Please try again.");
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -122,7 +126,8 @@ const FurnitureGallery = () => {
         {filteredItems.map((item) => (
           <div
             key={item._id}
-            className="bg-white p-4 rounded-xl shadow hover:shadow-xl transition flex flex-col"
+            onClick={() => navigate(`/products/${item._id}`)}
+            className="bg-white p-4 rounded-xl shadow hover:shadow-xl transition flex flex-col cursor-pointer"
           >
             <img
               src={item.image}
@@ -148,14 +153,20 @@ const FurnitureGallery = () => {
 
             <div className="flex justify-between items-center mt-auto">
               <button
-                onClick={() => handleAddToCart(item)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAddToCart(item);
+                }}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
               >
                 Add to Cart 🛒
               </button>
 
               <button
-                onClick={() => handleAddToWishlist(item)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAddToWishlist(item);
+                }}
                 className="text-red-500 hover:text-red-600 text-2xl"
               >
                 ❤️
