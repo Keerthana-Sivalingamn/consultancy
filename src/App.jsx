@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-d
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Login from "./components/Login";
-import Signup from "./components/SignUp";
+import SignUp from "./components/SignUp";
 import Dashboard from "./components/Dashboard";
 import DashboardAdmin from "./components/DashboardAdmin";
 import Contact from "./components/Contact";
@@ -69,7 +69,7 @@ function App() {
         />
         <Route
           path="/signup"
-          element={isAuthenticated ? <Navigate to="/dashboard" /> : <Signup />}
+          element={isAuthenticated ? <Navigate to="/dashboard" /> : <SignUp />}
         />
         <Route
           path="/dashboard"
