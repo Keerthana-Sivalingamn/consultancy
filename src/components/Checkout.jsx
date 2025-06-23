@@ -19,7 +19,7 @@ const Checkout = () => {
       }
 
       try {
-        const res = await axios.get(`http://localhost:5000/api/cart/${user.id}`, {
+        const res = await axios.get(`https://consultancysrc.onrender.com/api/cart/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -40,7 +40,7 @@ const Checkout = () => {
   const handleCheckout = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/checkout",
+        "https://consultancysrc.onrender.com/api/checkout",
         { userId: user.id },
         { headers: { Authorization: `Bearer ${token}` } }
       );

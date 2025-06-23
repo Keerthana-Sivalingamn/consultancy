@@ -19,7 +19,7 @@ const AdminOrderReport = () => {
       if (endDate) params.append("endDate", endDate);
       if (status !== "all") params.append("status", status);
 
-      const response = await fetch(`http://localhost:5000/api/orders?${params.toString()}`, {
+      const response = await fetch(`https://consultancysrc.onrender.com/api/orders?${params.toString()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -48,7 +48,7 @@ const AdminOrderReport = () => {
       if (endDate) params.append("endDate", endDate);
       if (status !== "all") params.append("status", status);
 
-      const url = `http://localhost:5000/api/orders/report?${params.toString()}`;
+      const url = `https://consultancysrc.onrender.com/api/orders/report?${params.toString()}`;
 
       const response = await fetch(url, {
         headers: {

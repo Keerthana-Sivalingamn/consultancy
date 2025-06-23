@@ -15,7 +15,7 @@ const OrderSuccessPage = () => {
     const email = user?.email;
 
     if (email && orderId) {
-      axios.post("http://localhost:5000/api/send-confirmation", {
+      axios.post("https://consultancysrc.onrender.com/api/send-confirmation", {
         email,
         orderId,
       })

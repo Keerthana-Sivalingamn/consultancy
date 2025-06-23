@@ -19,7 +19,7 @@ const AdminFurniturePage = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/products");
+      const res = await axios.get("https://consultancysrc.onrender.com/api/products");
       console.log("Fetched products:", res.data);
       setFurnitureItems(res.data);
     } catch (err) {
@@ -30,7 +30,7 @@ const AdminFurniturePage = () => {
   const handleDelete = async (productId) => {
     const cleanId = productId.replace(/^"(.*)"$/, '$1');
     try {
-      await axios.delete(`http://localhost:5000/api/products/${cleanId}`);
+      await axios.delete(`https://consultancysrc.onrender.com/api/products/${cleanId}`);
       const updatedItems = furnitureItems.filter((item) => item._id !== productId);
       setFurnitureItems(updatedItems);
       console.log("✅ Item deleted:", productId);
@@ -73,7 +73,7 @@ const AdminFurniturePage = () => {
       console.log("🆔 ID to update:", cleanId);
   
       await axios.put(
-        `http://localhost:5000/api/products/${cleanId}`,
+        `https://consultancysrc.onrender.com/api/products/${cleanId}`,
         updatedForm,
         {
           headers: {

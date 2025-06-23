@@ -22,7 +22,7 @@ const ProductDetails = () => {
   const fetchReviews = async () => {
     try {
       const reviewsRes = await axios.get(
-        `http://localhost:5000/api/reviews/${id}`
+        `https://consultancysrc.onrender.com/api/reviews/${id}`
       );
       setReviews(reviewsRes.data);
     } catch (err) {
@@ -35,19 +35,19 @@ const ProductDetails = () => {
       setLoading(true);
       try {
         // Fetch product details
-        const res = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const res = await axios.get(`https://consultancysrc.onrender.com/api/products/${id}`);
         setProduct(res.data);
 
         // Fetch similar products
         const similarRes = await axios.get(
-          `http://localhost:5000/api/products/similar/${id}`
+          `https://consultancysrc.onrender.com/api/products/similar/${id}`
         );
         setSimilarProducts(similarRes.data);
 
         // Fetch wishlist status if user is logged in
         if (userId) {
           const wishlistRes = await axios.get(
-            `http://localhost:5000/api/wishlist/${userId}`
+            `https://consultancysrc.onrender.com/api/wishlist/${userId}`
           );
           const isInList = wishlistRes.data.some((item) => item._id === id);
           setIsInWishlist(isInList);
@@ -70,7 +70,7 @@ const ProductDetails = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `http://localhost:5000/api/cart/add`,
+        `https://consultancysrc.onrender.com/api/cart/add`,
         { productId: id, quantity: 1 },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -90,7 +90,7 @@ const ProductDetails = () => {
       }
 
       if (isInWishlist) {
-        const res = await axios.delete(`http://localhost:5000/api/wishlist/remove`, {
+        const res = await axios.delete(`https://consultancysrc.onrender.com/api/wishlist/remove`, {
           data: { productId: id },
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -100,7 +100,7 @@ const ProductDetails = () => {
         }
       } else {
         const res = await axios.post(
-          `http://localhost:5000/api/wishlist/add`,
+          `https://consultancysrc.onrender.com/api/wishlist/add`,
           { productId: id },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -126,7 +126,7 @@ const ProductDetails = () => {
       // If we're editing an existing review
       if (isEditingReview && currentReviewId) {
         const res = await axios.put(
-          `http://localhost:5000/api/reviews/update`,
+          `https://consultancysrc.onrender.com/api/reviews/update`,
           { reviewId: currentReviewId, reviewText, rating },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -145,7 +145,7 @@ const ProductDetails = () => {
       } else {
         // Original code for adding a new review
         const res = await axios.post(
-          `http://localhost:5000/api/reviews/add`,
+          `https://consultancysrc.onrender.com/api/reviews/add`,
           { productId: id, reviewText, rating },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -195,7 +195,7 @@ const ProductDetails = () => {
       }
   
       const res = await axios.delete(
-        `http://localhost:5000/api/reviews/delete`,
+        `https://consultancysrc.onrender.com/api/reviews/delete`,
         { 
           data: { reviewId },
           headers: { Authorization: `Bearer ${token}` } 

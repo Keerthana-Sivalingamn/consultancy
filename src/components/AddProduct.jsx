@@ -57,7 +57,7 @@ const AddProduct = () => {
     try {
       // Include the token in the Authorization header
       await axios.post(
-        "http://localhost:5000/api/products", 
+        "https://consultancysrc.onrender.com/api/products", 
         product, 
         {
           headers: {

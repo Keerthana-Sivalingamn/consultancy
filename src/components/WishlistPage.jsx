@@ -10,6 +10,7 @@ const WishlistPage = () => {
   const [address, setAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false); // Add this state to track form submission
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const WishlistPage = () => {
     }
 
     try {
-      const res = await axios.get(`http://localhost:5000/api/cart/${user.id}`, {
+      const res = await axios.get(`https://consultancysrc.onrender.com/api/cart/${user.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -47,116 +48,98 @@ const WishlistPage = () => {
   useEffect(() => {
     fetchWishlist();
   }, [user, token]);
+
   const handleRemove = async (cartItemId) => {
-  if (!cartItemId || !token) {
-    console.error("Invalid cartItemId or token");
-    return;
-  }
-
-  try {
-    // Optimistic UI update - remove the item from the UI immediately
-    setWishlist(prevWishlist => prevWishlist.filter(item => item._id !== cartItemId));
-    
-    // Make API call to remove item from backend
-    const response = await axios.delete(
-      `http://localhost:5000/api/cart/remove/${cartItemId}`,
-      { 
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        } 
-      }
-    );
-    
-    console.log("Item removed successfully:", response.data);
-    
-  } catch (err) {
-    console.error("Error removing item from cart:", err.response?.data || err.message);
-    
-    // Log additional details for debugging
-    if (err.response) {
-      console.error("Response status:", err.response.status);
-      console.error("Response data:", err.response.data);
+    if (!cartItemId || !token) {
+      console.error("Invalid cartItemId or token");
+      return;
     }
-    
-    // Revert the optimistic update if the API call fails
-    fetchWishlist();
-    
-    // Show error to user
-    setError("Failed to remove item from cart. Please try again.");
-  }
-};
 
- const handleQuantityChange = async (cartItemId, productId, newQuantity) => {
-  if (newQuantity < 1) return;
-  
-  console.log("Starting quantity update:", { cartItemId, productId, newQuantity });
-
-  // Trim IDs and ensure they're not undefined or null
-  const userId = user?.id?.trim() || "";
-  const productIdTrimmed = productId?.toString()?.trim() || "";
-  
-  if (!userId || !productIdTrimmed) {
-    console.error("Invalid userId or productId");
-    return;
-  }
-
-  // DEBUG: Log the wishlist before update
-  console.log("Wishlist before update:", wishlist);
-
-  // Update UI immediately for better UX (optimistic update)
-  setWishlist(prevWishlist => {
-    const updatedWishlist = prevWishlist.map(item => {
-      if (item._id === cartItemId) {
-        console.log(`Updating item ${cartItemId} from quantity ${item.quantity} to ${newQuantity}`);
-        return { ...item, quantity: newQuantity };
+    try {
+      setWishlist(prevWishlist => prevWishlist.filter(item => item._id !== cartItemId));
+      
+      const response = await axios.delete(
+        `https://consultancysrc.onrender.com/api/cart/remove/${cartItemId}`,
+        { 
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          } 
+        }
+      );
+      
+      console.log("Item removed successfully:", response.data);
+      
+    } catch (err) {
+      console.error("Error removing item from cart:", err.response?.data || err.message);
+      
+      if (err.response) {
+        console.error("Response status:", err.response.status);
+        console.error("Response data:", err.response.data);
       }
-      return item;
+      
+      fetchWishlist();
+      setError("Failed to remove item from cart. Please try again.");
+    }
+  };
+
+  const handleQuantityChange = async (cartItemId, productId, newQuantity) => {
+    if (newQuantity < 1) return;
+    
+    console.log("Starting quantity update:", { cartItemId, productId, newQuantity });
+
+    const userId = user?.id?.trim() || "";
+    const productIdTrimmed = productId?.toString()?.trim() || "";
+    
+    if (!userId || !productIdTrimmed) {
+      console.error("Invalid userId or productId");
+      return;
+    }
+
+    console.log("Wishlist before update:", wishlist);
+
+    setWishlist(prevWishlist => {
+      const updatedWishlist = prevWishlist.map(item => {
+        if (item._id === cartItemId) {
+          console.log(`Updating item ${cartItemId} from quantity ${item.quantity} to ${newQuantity}`);
+          return { ...item, quantity: newQuantity };
+        }
+        return item;
+      });
+      
+      console.log("Updated wishlist (optimistic):", updatedWishlist);
+      return updatedWishlist;
     });
-    
-    // DEBUG: Log the updated wishlist
-    console.log("Updated wishlist (optimistic):", updatedWishlist);
-    return updatedWishlist;
-  });
 
-  try {
-    // Log the values being sent
-    console.log(`API call params: userId=${userId}, productId=${productIdTrimmed}, quantity=${newQuantity}`);
-    
-    // Make the API call
-    const response = await axios.put(
-      `http://localhost:5000/api/cart/update/${userId}/${productIdTrimmed}`,
-      { quantity: newQuantity },
-      { 
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        } 
+    try {
+      console.log(`API call params: userId=${userId}, productId=${productIdTrimmed}, quantity=${newQuantity}`);
+      
+      const response = await axios.put(
+        `https://consultancysrc.onrender.com/api/cart/update/${userId}/${productIdTrimmed}`,
+        { quantity: newQuantity },
+        { 
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          } 
+        }
+      );
+      
+      console.log("API response:", response.data);
+      
+    } catch (err) {
+      console.error("Error updating quantity:", err.response?.data || err.message);
+      
+      if (err.response) {
+        console.error("Response status:", err.response.status);
+        console.error("Response data:", err.response.data);
       }
-    );
-    
-    console.log("API response:", response.data);
-    
-    // Force a re-fetch to ensure UI is in sync with backend
-    // Uncomment this if optimistic updates aren't working:
-    // await fetchWishlist();
-    
-  } catch (err) {
-    console.error("Error updating quantity:", err.response?.data || err.message);
-    
-    // Log additional details for debugging
-    if (err.response) {
-      console.error("Response status:", err.response.status);
-      console.error("Response data:", err.response.data);
+      
+      fetchWishlist();
+    } finally {
+      console.log("Wishlist after operation:", wishlist);
     }
-    
-    // Revert the optimistic update if the API call fails
-    fetchWishlist();
-  } finally {
-    // DEBUG: Log the final wishlist state
-    console.log("Wishlist after operation:", wishlist);
-  }
-};
+  };
 
   // Validate phone number
   const validatePhone = (phone) => {
@@ -183,16 +166,35 @@ const WishlistPage = () => {
     setCheckoutSummary({ items: summary, totalAmount });
   };
 
-  // Confirm Order
-  const handleConfirmOrder = async () => {
+  // Confirm Order - Modified to properly handle the submission
+  const handleConfirmOrder = async (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
+    
+    // Perform validation before submitting
+    if (!address.trim()) {
+      setError("Please enter a delivery address");
+      return;
+    }
+    
     // Validate phone number before proceeding
-    if (!validatePhone(phoneNumber)) {
+    if (!phoneNumber.trim() || !validatePhone(phoneNumber)) {
       return;
     }
 
+    // Set submitting state to true to show loading indicator and prevent multiple submissions
+    setIsSubmitting(true);
+    
     try {
+      console.log("Submitting order with data:", {
+        userId: user.id,
+        items: checkoutSummary.items,
+        totalAmount: checkoutSummary.totalAmount,
+        address,
+        phoneNumber
+      });
+      
       const response = await axios.post(
-        "http://localhost:5000/api/orders",
+        "https://consultancysrc.onrender.com/api/orders",
         {
           userId: user.id,
           items: checkoutSummary.items,
@@ -200,16 +202,31 @@ const WishlistPage = () => {
           address,
           phoneNumber,
         },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { 
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          } 
+        }
       );
   
+      console.log("Order placed successfully:", response.data);
       const orderId = response.data.orderId;
   
       alert("Order placed successfully!");
       navigate("/order-success", { state: { orderId } });
     } catch (err) {
-      console.error("Error placing order:", err);
-      setError("Failed to place order.");
+      console.error("Error placing order:", err.response?.data || err.message);
+      
+      // Log detailed error information
+      if (err.response) {
+        console.error("Response status:", err.response.status);
+        console.error("Response data:", err.response.data);
+      }
+      
+      setError("Failed to place order. Please check your details and try again.");
+    } finally {
+      setIsSubmitting(false); // Reset submitting state regardless of outcome
     }
   };
   
@@ -236,7 +253,10 @@ const WishlistPage = () => {
           <h2 className="text-xl font-semibold text-center text-gray-800 mb-2">Something went wrong</h2>
           <p className="text-red-500 text-center">{error}</p>
           <button 
-            onClick={() => window.location.reload()} 
+            onClick={() => {
+              setError(null);
+              window.location.reload();
+            }} 
             className="w-full mt-6 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-300"
           >
             Try Again
@@ -287,7 +307,6 @@ const WishlistPage = () => {
                 
                 <div className="divide-y divide-gray-200">
                   {wishlist.map((item) => {
-                    // Extract the product ID properly
                     const productId = item.productId && typeof item.productId === 'object'
                       ? item.productId._id
                       : item.productId;
@@ -433,64 +452,76 @@ const WishlistPage = () => {
                       <p className="mt-0.5 text-sm text-gray-500">Shipping and taxes calculated at checkout.</p>
                     </div>
                     
-                    <div className="mt-6">
-                      <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-                        Delivery Address
-                      </label>
-                      <textarea
-                        id="address"
-                        name="address"
-                        rows="3"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                        placeholder="Enter your full delivery address"
-                        required
-                      ></textarea>
-                    </div>
-                    
-                    <div className="mt-6">
-  <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-2">
-    Phone Number
-  </label>
-  <textarea
-    id="phoneNumber"
-    name="phoneNumber"
-    rows="3"
-    value={phoneNumber}
-    onChange={(e) => {
-      setPhoneNumber(e.target.value);
-      if (phoneError) validatePhone(e.target.value);
-    }}
-    className={`shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
-      phoneError ? 'border-red-500' : ''
-    }`}
-    placeholder="Enter your 10-digit phone number"
-    style={{ minHeight: '80px' }}
-    required
-  ></textarea>
-  {phoneError && (
-    <p className="mt-1 text-sm text-red-600">{phoneError}</p>
-  )}
-</div>
-                    
-                    <div className="mt-6">
+                    {/* Changed to an actual form for proper submission */}
+                    <form onSubmit={handleConfirmOrder} className="mt-6">
+                      <div className="mb-6">
+                        <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
+                          Delivery Address
+                        </label>
+                        <textarea
+                          id="address"
+                          name="address"
+                          rows="3"
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                          className={`shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
+                            !address.trim() ? 'border-red-500' : ''
+                          }`}
+                          placeholder="Enter your full delivery address"
+                          required
+                        ></textarea>
+                        {!address.trim() && (
+                          <p className="mt-1 text-sm text-red-600">Please enter your delivery address</p>
+                        )}
+                      </div>
+                      
+                      <div className="mb-6">
+                        <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-2">
+                          Phone Number
+                        </label>
+                        <input
+                          id="phoneNumber"
+                          name="phoneNumber"
+                          type="tel"
+                          value={phoneNumber}
+                          onChange={(e) => {
+                            setPhoneNumber(e.target.value);
+                            if (phoneError) validatePhone(e.target.value);
+                          }}
+                          onBlur={(e) => validatePhone(e.target.value)}
+                          className={`shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
+                            phoneError ? 'border-red-500' : ''
+                          }`}
+                          placeholder="Enter your 10-digit phone number"
+                          required
+                        />
+                        {phoneError && (
+                          <p className="mt-1 text-sm text-red-600">{phoneError}</p>
+                        )}
+                      </div>
+                      
                       <button
-                        onClick={handleConfirmOrder}
-                        disabled={!address.trim() || !phoneNumber.trim() || phoneError}
+                        type="submit"
+                        disabled={!address.trim() || !phoneNumber.trim() || phoneError || isSubmitting}
                         className={`w-full flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white ${
-                          address.trim() && phoneNumber.trim() && !phoneError ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-gray-300 cursor-not-allowed'
+                          address.trim() && phoneNumber.trim() && !phoneError && !isSubmitting 
+                            ? 'bg-indigo-600 hover:bg-indigo-700' 
+                            : 'bg-gray-300 cursor-not-allowed'
                         } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
                       >
-                        Place Order
+                        {isSubmitting ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Processing...
+                          </>
+                        ) : (
+                          'Place Order'
+                        )}
                       </button>
-                      {!address.trim() && (
-                        <p className="mt-2 text-sm text-red-600">Please enter your delivery address</p>
-                      )}
-                      {!phoneNumber.trim() && !phoneError && (
-                        <p className="mt-2 text-sm text-red-600">Please enter your phone number</p>
-                      )}
-                    </div>
+                    </form>
                   </div>
                 </div>
               </div>

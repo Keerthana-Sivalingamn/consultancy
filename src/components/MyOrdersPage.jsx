@@ -23,7 +23,7 @@ const MyOrdersPage = () => {
     }
     
     try {
-      const response = await fetch("http://localhost:5000/api/orders/my", {
+      const response = await fetch("https://consultancysrc.onrender.com/api/orders/my", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

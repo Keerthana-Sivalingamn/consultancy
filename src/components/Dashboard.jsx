@@ -158,34 +158,35 @@ const HomePage = () => {
         </div>
       </nav>
 
-      {/* Hero Section with new gradient */}
+      {/* Hero Section with furniture background image */}
       <section
-  className="hero-section relative text-center py-32 px-6 shadow-inner overflow-hidden bg-gray-300"
->
-  {/* Optional pattern overlay – remove if not needed */}
-  {/* <div className="absolute inset-0 opacity-5 bg-repeat" style={{
-    backgroundImage: "url('data:image/svg+xml,...')"
-  }}></div> */}
+        className="hero-section relative text-center py-32 px-6 shadow-inner overflow-hidden bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: "url('https://www.cyruscrafts.com/img/cms/blog/dark-sofa-or-light0sofa/sofa-colors.jpg')",
 
-  <div className="relative z-10">
-    <h1 className="text-5xl md:text-6xl font-bold mb-6 text-black drop-shadow-lg">
-      Welcome to Indian Furniture Store 🛋️
-    </h1>
+          minHeight: '500px'
+        }}
+      >
+        {/* Dark overlay for better text readability */}
+        
 
-    <p className="text-black text-xl max-w-2xl mx-auto leading-relaxed">
-      Discover premium furniture for every room — elegance, comfort, and quality in one place 🏡
-    </p>
+        <div className="relative z-10">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white drop-shadow-2xl">
+            Welcome to Indian Furniture Store 🛋️
+          </h1>
 
-    <button
-      onClick={handleScrollToGallery}
-      className="mt-10 px-8 py-3 bg-black text-white rounded-full text-lg hover:bg-gray-900 shadow-lg transform hover:scale-105 transition flex items-center gap-2 mx-auto"
-    >
-      Explore Collection <FaChevronDown />
-    </button>
-  </div>
-</section>
+          <p className="text-white text-xl max-w-2xl mx-auto leading-relaxed drop-shadow-lg">
+            Discover premium furniture for every room — elegance, comfort, and quality in one place 🏡
+          </p>
 
-
+          <button
+            onClick={handleScrollToGallery}
+            className="mt-10 px-8 py-3 bg-amber-500 text-white rounded-full text-lg hover:bg-amber-600 shadow-lg transform hover:scale-105 transition flex items-center gap-2 mx-auto font-semibold"
+          >
+            Explore Collection <FaChevronDown />
+          </button>
+        </div>
+      </section>
 
       {/* About Our Shop Section - New color scheme (Dashboard section) */}
       <section className="py-16 px-8 bg-gradient-to-r from-white to-purple-50">

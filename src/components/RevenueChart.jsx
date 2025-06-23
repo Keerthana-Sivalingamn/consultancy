@@ -67,7 +67,7 @@ const RevenueChart = () => {
     const fetchRevenueData = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:5000/api/orders/revenue-by-category", {
+        const res = await fetch("https://consultancysrc.onrender.com/api/orders/revenue-by-category", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

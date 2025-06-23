@@ -19,7 +19,7 @@ const MyWishlist = () => {
         console.log("Fetching wishlist with token:", token.substring(0, 10) + "...");
         
         // Fetch wishlist items from the backend using fetch instead of axios
-        const response = await fetch("http://localhost:5000/api/wishlist", {
+        const response = await fetch("https://consultancysrc.onrender.com/api/wishlist", {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -62,7 +62,7 @@ const MyWishlist = () => {
 
     try {
       // Send the productId in the request body using fetch instead of axios
-      const response = await fetch("http://localhost:5000/api/wishlist/remove", {
+      const response = await fetch("https://consultancysrc.onrender.com/api/wishlist/remove", {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,

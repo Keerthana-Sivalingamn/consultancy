@@ -14,7 +14,7 @@ const FurnitureGallery = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/products");
+        const res = await axios.get("https://consultancysrc.onrender.com/api/products");
         setFurnitureItems(res.data);
         setFilteredItems(res.data);
 
@@ -49,7 +49,7 @@ const FurnitureGallery = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/cart/add",
+        "https://consultancysrc.onrender.com/api/cart/add",
         {
           productId: item._id,
           quantity: 1,
@@ -79,7 +79,7 @@ const FurnitureGallery = () => {
   
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/wishlist/add",
+        "https://consultancysrc.onrender.com/api/wishlist/add",
         { productId: item._id },
         {
           headers: {
